@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 문장 - 이은학교</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Jua -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <!-- Tone.js (Web Audio Framework) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            font-family: 'Jua', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Custom scrollbar for cute aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fef3c7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 9999px;
+        }
+
+        /* Floating background elements animation */
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(3deg); }
+        }
+        @keyframes pulse-gentle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .animate-float {
+            animation: float-slow 4s ease-in-out infinite;
+        }
+        .animate-pulse-gentle {
+            animation: pulse-gentle 2.5s ease-in-out infinite;
+        }
+        .animate-bounce-subtle {
+            animation: bounce-subtle 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-200 min-h-screen text-amber-950 flex flex-col justify-between overflow-x-hidden relative">
+
+    <!-- Cute Background Decorative Clouds & Sun -->
+    <div class="absolute top-4 left-6 text-amber-300/60 text-5xl md:text-7xl animate-float pointer-events-none select-none">
+        <i class="fa-solid font-bold fa-cloud"></i>
+    </div>
+    <div class="absolute top-12 right-10 text-orange-300/50 text-6xl md:text-8xl animate-float pointer-events-none select-none" style="animation-delay: -2s;">
+        <i class="fa-solid fa-cloud"></i>
+    </div>
+    <div class="absolute top-6 right-1/4 text-yellow-400/80 text-4xl md:text-5xl animate-bounce-subtle pointer-events-none select-none">
+        <i class="fa-solid fa-sun"></i>
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="w-full max-w-5xl mx-auto px-4 pt-4 md:pt-6 z-10">
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl p-3 md:p-4 shadow-lg border-2 border-orange-200 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="bg-amber-400 text-white p-2.5 md:p-3 rounded-2xl shadow-inner text-xl md:text-2xl flex items-center justify-center">
+                    🏫
+                </span>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-amber-900 tracking-wide">이은학교 리빙 보드</h1>
+                    <p class="text-xs md:text-sm text-amber-600">오늘의 한 문장 이야기</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 md:space-x-3">
+                <!-- Sound Toggle Button -->
+                <button id="sound-btn" class="bg-amber-100 hover:bg-amber-200 text-amber-800 border-2 border-amber-300 px-3 py-2 rounded-2xl text-sm md:text-base font-bold transition-all transform active:scale-95 flex items-center gap-2 shadow-sm">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-amber-600"></i>
+                    <span id="sound-text" class="hidden sm:inline">효과음 켜짐</span>
+                </button>
+                <!-- Speech TTS Button -->
+                <button id="speak-btn" class="bg-orange-500 hover:bg-orange-600 text-white px-3.5 py-2 rounded-2xl text-sm md:text-base font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <span>읽어주기</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-5xl mx-auto px-4 py-6 md:py-10 flex-grow flex flex-col justify-center gap-6 z-10">
+        
+        <!-- Today's Sentence Hero Card -->
+        <section class="bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-xl border-4 border-amber-300 text-center relative overflow-hidden">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-white px-5 py-2 rounded-full text-base md:text-lg shadow-sm mb-6">
+                <i class="fa-solid fa-star text-yellow-200"></i>
+                <span>오늘의 문장</span>
+                <i class="fa-solid fa-star text-yellow-200"></i>
+            </div>
+
+            <!-- Sentence Display Container -->
+            <div id="sentence-container" class="flex flex-wrap items-center justify-center gap-3 md:gap-4 py-4 md:py-6">
+                <!-- Word Badge 1 -->
+                <span class="word-card cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 text-amber-900 text-3xl sm:text-4xl md:text-5xl lg:text-6xl px-4 py-2 md:px-6 md:py-3 rounded-2xl shadow-sm transition-all transform hover:-translate-y-1 hover:scale-105 active:scale-95">
+                    이은학교
+                </span>
+                <!-- Word Badge 2 -->
+                <span class="word-card cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 text-amber-900 text-3xl sm:text-4xl md:text-5xl lg:text-6xl px-4 py-2 md:px-6 md:py-3 rounded-2xl shadow-sm transition-all transform hover:-translate-y-1 hover:scale-105 active:scale-95">
+                    학생
+                </span>
+                <!-- Word Badge 3 -->
+                <span class="word-card cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 text-amber-900 text-3xl sm:text-4xl md:text-5xl lg:text-6xl px-4 py-2 md:px-6 md:py-3 rounded-2xl shadow-sm transition-all transform hover:-translate-y-1 hover:scale-105 active:scale-95">
+                    수는
+                </span>
+                <!-- Word Badge 4 -->
+                <span class="word-card cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 text-amber-900 text-3xl sm:text-4xl md:text-5xl lg:text-6xl px-4 py-2 md:px-6 md:py-3 rounded-2xl shadow-sm transition-all transform hover:-translate-y-1 hover:scale-105 active:scale-95">
+                    모두
+                </span>
+                <!-- Highlighted Number Badge -->
+                <span id="number-highlight" class="cursor-pointer bg-gradient-to-r from-orange-500 to-amber-500 text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl px-5 py-3 md:px-7 md:py-4 rounded-3xl shadow-lg border-2 border-orange-300 transition-all transform hover:-translate-y-1.5 hover:scale-110 active:scale-95 animate-pulse-gentle flex items-center gap-2">
+                    <span>225명</span>
+                    <i class="fa-solid fa-sparkles text-yellow-200 text-2xl md:text-3xl"></i>
+                </span>
+                <!-- Word Badge 5 -->
+                <span class="word-card cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 text-amber-900 text-3xl sm:text-4xl md:text-5xl lg:text-6xl px-4 py-2 md:px-6 md:py-3 rounded-2xl shadow-sm transition-all transform hover:-translate-y-1 hover:scale-105 active:scale-95">
+                    입니다.
+                </span>
+            </div>
+
+            <p class="text-amber-700/80 text-sm sm:text-base mt-4">
+                💡 글자 카드를 누르면 멜로디가 나오고, '225명' 카드를 누르면 축하 폭죽이 터져요!
+            </p>
+        </section>
+
+        <!-- Educational Info Card / Student Progress Bar -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white/80 rounded-2xl p-4 shadow-sm border border-amber-200 flex items-center gap-3">
+                <div class="bg-amber-100 p-3 rounded-xl text-amber-600 text-2xl">🏫</div>
+                <div>
+                    <div class="text-xs text-amber-600 font-bold">학교명</div>
+                    <div class="text-lg font-bold text-amber-900">이은학교</div>
+                </div>
+            </div>
+
+            <div class="bg-white/80 rounded-2xl p-4 shadow-sm border border-amber-200 flex items-center gap-3">
+                <div class="bg-orange-100 p-3 rounded-xl text-orange-600 text-2xl">👨‍🎓</div>
+                <div>
+                    <div class="text-xs text-amber-600 font-bold">전체 학생 수</div>
+                    <div class="text-lg font-bold text-orange-600">총 225 명</div>
+                </div>
+            </div>
+
+            <div class="bg-white/80 rounded-2xl p-4 shadow-sm border border-amber-200 flex items-center gap-3">
+                <div class="bg-yellow-100 p-3 rounded-xl text-yellow-600 text-2xl">✨</div>
+                <div>
+                    <div class="text-xs text-amber-600 font-bold">오늘의 한마디</div>
+                    <div class="text-sm font-bold text-amber-900">밝고 건강하게 자라나요!</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs md:text-sm text-amber-800/70 z-10">
+        <p>© 이은학교 - 따뜻하고 즐거운 배움터 💛</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Global States ---
+            let soundEnabled = true;
+
+            // --- Tone.js Sound System ---
+            let synth, metallicSynth;
+            let audioInitialized = false;
+
+            function initAudio() {
+                if (audioInitialized) return;
+                try {
+                    Tone.start();
+                    
+                    // Cute Marimba style Synth for taps
+                    synth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "triangle" },
+                        envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.3 }
+                    }).toDestination();
+                    synth.volume.value = -8;
+
+                    // Sparkle Synth
+                    metallicSynth = new Tone.MetalSynth({
+                        frequency: 200,
+                        envelope: { attack: 0.001, decay: 0.1, release: 0.1 },
+                        harmonicity: 5.1,
+                        modulationIndex: 16,
+                        resonance: 4000,
+                        octaves: 1.5
+                    }).toDestination();
+                    metallicSynth.volume.value = -24;
+
+                    audioInitialized = true;
+                } catch (e) {
+                    console.log("Audio Context initialized on touch.");
+                }
+            }
+
+            function playNote(note = "C5", duration = "8n") {
+                if (!soundEnabled) return;
+                initAudio();
+                if (synth) {
+                    try { synth.triggerAttackRelease(note, duration); } catch (e) {}
+                }
+            }
+
+            function playSparkle() {
+                if (!soundEnabled) return;
+                initAudio();
+                if (metallicSynth) {
+                    try { metallicSynth.triggerAttackRelease("16n"); } catch (e) {}
+                }
+            }
+
+            // --- Text To Speech (TTS) ---
+            function speakSentence() {
+                initAudio();
+                playSparkle();
+
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // Stop ongoing speech
+                    const text = "이은학교 학생 수는 모두 225명 입니다.";
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ko-KR';
+                    utterance.rate = 0.9; // Slightly slower for warm tone
+                    utterance.pitch = 1.1; // Friendly pitch
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    console.log("TTS not supported.");
+                }
+            }
+
+            // --- Confetti & Highlight Effects ---
+            function triggerCelebration() {
+                initAudio();
+                playNote("C5", "8n");
+                setTimeout(() => playNote("E5", "8n"), 100);
+                setTimeout(() => playNote("G5", "8n"), 200);
+                setTimeout(() => playNote("C6", "4n"), 300);
+
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 90,
+                        spread: 80,
+                        origin: { y: 0.5 },
+                        colors: ['#f59e0b', '#f97316', '#fbbf24', '#3b82f6', '#ec4899']
+                    });
+                }
+            }
+
+            // --- Event Listeners ---
+
+            // 1. Speak Button
+            document.getElementById('speak-btn').addEventListener('click', speakSentence);
+
+            // 2. Sound Toggle
+            const soundBtn = document.getElementById('sound-btn');
+            const soundIcon = document.getElementById('sound-icon');
+            const soundText = document.getElementById('sound-text');
+
+            soundBtn.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                if (soundEnabled) {
+                    soundIcon.className = "fa-solid fa-volume-high text-amber-600";
+                    soundText.innerText = "효과음 켜짐";
+                    initAudio();
+                    playNote("C5", "16n");
+                } else {
+                    soundIcon.className = "fa-solid fa-volume-xmark text-gray-400";
+                    soundText.innerText = "효과음 끔";
+                }
+            });
+
+            // 3. Word Cards Click Effects
+            const wordCards = document.querySelectorAll('.word-card');
+            const notes = ["C4", "D4", "E4", "F4", "G4", "A4", "B4"];
+            wordCards.forEach((card, index) => {
+                card.addEventListener('click', () => {
+                    initAudio();
+                    playNote(notes[index % notes.length], "8n");
+                    card.classList.add('scale-110', 'bg-amber-200');
+                    setTimeout(() => card.classList.remove('scale-110', 'bg-amber-200'), 200);
+                });
+            });
+
+            // 4. Number Highlight Click
+            const numberHighlight = document.getElementById('number-highlight');
+            numberHighlight.addEventListener('click', () => {
+                triggerCelebration();
+            });
+        });
+    </script>
+</body>
+</html>
