@@ -687,18 +687,18 @@
       <div class="hero-copy">
         <p class="event-chip"><span aria-hidden="true">✦</span> 모두가 주인공인 디지털 축제</p>
         <h2 id="hero-title">우리의 가능성을<br><span class="accent">클릭!</span> 하세요</h2>
-        <p class="hero-description">함께 성장하는 이은 E-페스티벌 정보경진대회에 오신 것을 환영합니다.</p>
+        <p class="hero-description">함께 배우고 성장하는 특수학교, 이은학교의 E-페스티벌 정보경진대회에 오신 것을 환영합니다.</p>
         <div class="hero-meta" aria-hidden="true">2026 · DIGITAL CHALLENGE</div>
       </div>
       <div class="hero-visual" aria-hidden="true">
         <div class="orbit"></div>
         <div class="score-card">
           <div class="score-card-top">
-            <span class="score-label">IEUN SCHOOL</span>
+            <span class="score-label">이은학교</span>
             <span class="live-dot">READY</span>
           </div>
           <div class="score-number">225<small>STUDENTS</small></div>
-          <div class="score-footer">한 명 한 명의 가능성이 빛나는 무대</div>
+          <div class="score-footer">함께 배우고 성장하는 특수학교</div>
         </div>
       </div>
     </section>
@@ -712,16 +712,16 @@
 
       <div class="sentence-stage">
         <div id="sentence-container" class="sentence-container" aria-label="이은학교 학생 수는 모두 225명입니다">
-          <button class="word-card" type="button" data-speech="이은학교">이은학교</button>
-          <button class="word-card" type="button" data-speech="학생 수는">학생 수는</button>
-          <button class="word-card" type="button" data-speech="모두">모두</button>
-          <button id="number-highlight" class="number-highlight" type="button" data-speech="이백이십오명" aria-label="225명 읽기 및 축하 효과 보기">225명 <span aria-hidden="true">✦</span></button>
-          <button class="word-card" type="button" data-speech="입니다">입니다!</button>
+          <button class="word-card" type="button" data-audio="tts-ieun-school" data-speech="이은학교">이은학교</button>
+          <button class="word-card" type="button" data-audio="tts-student-count" data-speech="학생 수는">학생 수는</button>
+          <button class="word-card" type="button" data-audio="tts-all" data-speech="모두">모두</button>
+          <button id="number-highlight" class="number-highlight" type="button" data-audio="tts-two-twenty-five" data-speech="이백이십오 명" aria-label="225명 읽기 및 축하 효과 보기">225명 <span aria-hidden="true">✦</span></button>
+          <button class="word-card" type="button" data-audio="tts-is" data-speech="입니다">입니다!</button>
         </div>
       </div>
 
       <div class="challenge-tools">
-        <button id="speak-btn" class="speak-btn" type="button" aria-label="오늘의 문제 읽어주기">
+        <button id="speak-btn" class="speak-btn" type="button" data-audio="tts-full-question" aria-label="오늘의 문제 읽어주기">
           <span class="speak-btn-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M8 18h8"/><path d="M12 18v3"/><rect x="8" y="3" width="8" height="12" rx="4"/><path d="M5 11a7 7 0 0 0 14 0"/></svg>
           </span>
@@ -766,11 +766,20 @@
     <p>2026 이은 E-페스티벌 정보경진대회 · 모두의 가능성이 빛나는 무대</p>
   </footer>
 
+  <div id="speech-audio" hidden aria-hidden="true">
+    <audio id="tts-full-question" preload="auto" src="audio/full-question.wav"></audio>
+    <audio id="tts-ieun-school" preload="auto" src="audio/ieun-school.wav"></audio>
+    <audio id="tts-student-count" preload="auto" src="audio/student-count.wav"></audio>
+    <audio id="tts-all" preload="auto" src="audio/all.wav"></audio>
+    <audio id="tts-two-twenty-five" preload="auto" src="audio/two-twenty-five.wav"></audio>
+    <audio id="tts-is" preload="auto" src="audio/is.wav"></audio>
+  </div>
   <div id="live-message" class="sr-only" aria-live="polite"></div>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       let soundEnabled = true;
       let audioContext;
+      let activeSpeechAudio;
       const liveMessage = document.getElementById('live-message');
 
       function initAudio() {
@@ -796,19 +805,30 @@
         } catch (_) {}
       }
 
-      function speakText(text, { rate = .84, pitch = 1.04, onEnd } = {}) {
+      function stopSpeech() {
+        if (activeSpeechAudio) {
+          activeSpeechAudio.onended = null;
+          activeSpeechAudio.onerror = null;
+          activeSpeechAudio.pause();
+          activeSpeechAudio.currentTime = 0;
+          activeSpeechAudio = null;
+        }
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      }
+
+      function speakWithBrowser(text, onEnd) {
         if (!('speechSynthesis' in window)) {
           liveMessage.textContent = '이 브라우저에서는 음성 읽기를 지원하지 않습니다.';
           if (onEnd) onEnd();
           return false;
         }
 
-        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
         const utterance = new SpeechSynthesisUtterance(text);
         const koreanVoice = window.speechSynthesis.getVoices().find((voice) => voice.lang.toLowerCase().startsWith('ko'));
         utterance.lang = 'ko-KR';
-        utterance.rate = rate;
-        utterance.pitch = pitch;
+        utterance.rate = .84;
+        utterance.pitch = 1.04;
         if (koreanVoice) utterance.voice = koreanVoice;
         if (onEnd) {
           utterance.onend = onEnd;
@@ -819,9 +839,40 @@
         return true;
       }
 
+      function playSpeech(audioId, text, { onEnd } = {}) {
+        stopSpeech();
+        const audio = document.getElementById(audioId);
+        if (!audio) return speakWithBrowser(text, onEnd);
+
+        let fallbackStarted = false;
+        const startFallback = () => {
+          if (fallbackStarted) return;
+          fallbackStarted = true;
+          if (activeSpeechAudio === audio) activeSpeechAudio = null;
+          speakWithBrowser(text, onEnd);
+        };
+
+        activeSpeechAudio = audio;
+        audio.currentTime = 0;
+        audio.onended = () => {
+          if (activeSpeechAudio === audio) activeSpeechAudio = null;
+          if (onEnd) onEnd();
+        };
+        audio.onerror = startFallback;
+        liveMessage.textContent = `${text} 읽기`;
+
+        try {
+          const playback = audio.play();
+          if (playback && typeof playback.catch === 'function') playback.catch(startFallback);
+          return true;
+        } catch (_) {
+          return startFallback();
+        }
+      }
+
       function speakSentence() {
-        playNote('G5', '16n');
-        speakText('이은학교 학생 수는 모두 이백이십오명 입니다.', { rate: .88, pitch: 1.05 });
+        const button = document.getElementById('speak-btn');
+        playSpeech(button.dataset.audio, '이은학교 학생 수는 모두 이백이십오 명입니다.');
       }
 
       function playCelebrationSound() {
@@ -867,7 +918,7 @@
 
       document.querySelectorAll('.word-card').forEach((card) => {
         card.addEventListener('click', () => {
-          speakText(card.dataset.speech || card.textContent.trim());
+          playSpeech(card.dataset.audio, card.dataset.speech || card.textContent.trim());
           card.classList.add('is-active');
           setTimeout(() => card.classList.remove('is-active'), 260);
         });
@@ -876,7 +927,7 @@
       const numberHighlight = document.getElementById('number-highlight');
       numberHighlight.addEventListener('click', () => {
         celebrate({ withSound: false });
-        speakText(numberHighlight.dataset.speech, { rate: .82, onEnd: playCelebrationSound });
+        playSpeech(numberHighlight.dataset.audio, numberHighlight.dataset.speech, { onEnd: playCelebrationSound });
       });
     });
   </script>
