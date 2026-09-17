@@ -52,9 +52,6 @@
         <button id="sound-btn" type="button" aria-pressed="true" class="min-h-12 rounded-2xl border-2 border-green-200 bg-green-50 px-4 font-black text-green-800 hover:bg-green-100 active:scale-95 transition flex items-center gap-2">
           <span id="sound-icon" aria-hidden="true">🔊</span><span id="sound-text">효과음 켜짐</span>
         </button>
-        <button id="speak-btn" type="button" class="min-h-12 rounded-2xl bg-green-600 px-4 font-black text-white shadow-lg hover:bg-green-700 active:scale-95 transition flex items-center gap-2">
-          <span aria-hidden="true">💬</span><span>읽어주기</span>
-        </button>
       </div>
     </nav>
   </header>
@@ -73,9 +70,14 @@
     </section>
 
     <section class="glass neon-shadow rounded-[2rem] border border-green-100 p-5 md:p-9 text-center" aria-labelledby="sentence-title">
-      <div class="inline-flex items-center gap-2 rounded-full bg-green-100 px-5 py-2 font-black text-green-700">
-        <span aria-hidden="true">⭐</span>
-        <h2 id="sentence-title">오늘의 문제</h2>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div class="inline-flex items-center gap-3 rounded-full bg-green-100 px-6 py-3 font-black text-green-700 text-3xl md:text-4xl">
+          <span aria-hidden="true">⭐</span>
+          <h2 id="sentence-title">오늘의 문제</h2>
+        </div>
+        <button id="speak-btn" type="button" class="min-h-14 rounded-2xl bg-green-600 px-5 py-3 text-lg md:text-xl font-black text-white shadow-lg hover:bg-green-700 active:scale-95 transition flex items-center gap-2" aria-label="오늘의 문제 읽어주기">
+          <span aria-hidden="true">💬</span><span>읽어주기</span>
+        </button>
       </div>
       <div id="sentence-container" class="mt-6 flex flex-wrap items-center justify-center gap-3 md:gap-4" aria-label="이은학교 학생 수는 모두 225명입니다">
         <button class="word-card rounded-2xl border-2 border-green-100 bg-white px-4 py-3 text-2xl sm:text-3xl md:text-4xl font-black text-green-950" type="button">이은학교</button>
