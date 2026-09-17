@@ -712,11 +712,11 @@
 
       <div class="sentence-stage">
         <div id="sentence-container" class="sentence-container" aria-label="이은학교 학생 수는 모두 225명입니다">
-          <button class="word-card" type="button">이은학교</button>
-          <button class="word-card" type="button">학생 수는</button>
-          <button class="word-card" type="button">모두</button>
-          <button id="number-highlight" class="number-highlight" type="button" aria-label="225명, 축하 효과 보기">225명 <span aria-hidden="true">✦</span></button>
-          <button class="word-card" type="button">입니다!</button>
+          <button class="word-card" type="button" data-speech="이은학교">이은학교</button>
+          <button class="word-card" type="button" data-speech="학생 수는">학생 수는</button>
+          <button class="word-card" type="button" data-speech="모두">모두</button>
+          <button id="number-highlight" class="number-highlight" type="button" data-speech="이백이십오명" aria-label="225명 읽기 및 축하 효과 보기">225명 <span aria-hidden="true">✦</span></button>
+          <button class="word-card" type="button" data-speech="입니다">입니다!</button>
         </div>
       </div>
 
@@ -727,7 +727,7 @@
           </span>
           <span>문제 읽어주기</span>
         </button>
-        <p class="challenge-note">글자 카드를 눌러 소리를 듣고, <strong>225명</strong>을 눌러 축하 폭죽을 터뜨려 보세요!</p>
+        <p class="challenge-note">글자 카드를 눌러 읽어주는 소리를 듣고, <strong>225명</strong>을 눌러 축하 폭죽을 터뜨려 보세요!</p>
       </div>
     </section>
 
@@ -796,19 +796,40 @@
         } catch (_) {}
       }
 
-      function speakSentence() {
-        playNote('G5', '16n');
-        if (!('speechSynthesis' in window)) return;
+      function speakText(text, { rate = .84, pitch = 1.04, onEnd } = {}) {
+        if (!('speechSynthesis' in window)) {
+          liveMessage.textContent = '이 브라우저에서는 음성 읽기를 지원하지 않습니다.';
+          if (onEnd) onEnd();
+          return false;
+        }
+
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance('이은학교 학생 수는 모두 이백이십오명 입니다.');
+        const utterance = new SpeechSynthesisUtterance(text);
+        const koreanVoice = window.speechSynthesis.getVoices().find((voice) => voice.lang.toLowerCase().startsWith('ko'));
         utterance.lang = 'ko-KR';
-        utterance.rate = .88;
-        utterance.pitch = 1.05;
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        if (koreanVoice) utterance.voice = koreanVoice;
+        if (onEnd) {
+          utterance.onend = onEnd;
+          utterance.onerror = onEnd;
+        }
         window.speechSynthesis.speak(utterance);
+        liveMessage.textContent = `${text} 읽기`;
+        return true;
       }
 
-      function celebrate() {
+      function speakSentence() {
+        playNote('G5', '16n');
+        speakText('이은학교 학생 수는 모두 이백이십오명 입니다.', { rate: .88, pitch: 1.05 });
+      }
+
+      function playCelebrationSound() {
         ['C5', 'E5', 'G5', 'C6'].forEach((note, i) => setTimeout(() => playNote(note, i === 3 ? '4n' : '8n'), i * 110));
+      }
+
+      function celebrate({ withSound = true } = {}) {
+        if (withSound) playCelebrationSound();
         const symbols = ['◆', '✦', '●', '★', '■'];
         const colors = ['#fde047', '#86efac', '#ffffff', '#22c55e'];
         for (let i = 0; i < 52; i += 1) {
@@ -844,16 +865,19 @@
         if (soundEnabled) playNote('C5', '16n');
       });
 
-      const notes = ['C4', 'D4', 'E4', 'G4'];
-      document.querySelectorAll('.word-card').forEach((card, index) => {
+      document.querySelectorAll('.word-card').forEach((card) => {
         card.addEventListener('click', () => {
-          playNote(notes[index % notes.length]);
+          speakText(card.dataset.speech || card.textContent.trim());
           card.classList.add('is-active');
           setTimeout(() => card.classList.remove('is-active'), 260);
         });
       });
 
-      document.getElementById('number-highlight').addEventListener('click', celebrate);
+      const numberHighlight = document.getElementById('number-highlight');
+      numberHighlight.addEventListener('click', () => {
+        celebrate({ withSound: false });
+        speakText(numberHighlight.dataset.speech, { rate: .82, onEnd: playCelebrationSound });
+      });
     });
   </script>
 </body>
