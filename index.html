@@ -19,7 +19,8 @@
     header { width:min(1152px,100%); margin:auto; padding:28px 16px 0; }
     header nav { padding:14px 22px; border:1px solid #bbf7d0; border-radius:24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
     header nav > div { display:flex; align-items:center; gap:12px; }
-    header nav > div:first-child > div:first-child { width:64px; height:64px; flex:none; display:flex; align-items:center; justify-content:center; border-radius:50%; color:#fff; background:linear-gradient(135deg,#16a34a,#047857); box-shadow:0 8px 20px rgba(5,46,22,.2); outline:4px solid rgba(190,242,100,.7); }
+    header nav > div:first-child > div:first-child { width:64px; height:64px; flex:none; display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:50%; background:#fff; box-shadow:0 8px 20px rgba(5,46,22,.2); outline:4px solid rgba(190,242,100,.7); }
+    header nav > div:first-child > div:first-child img { width:100%; height:100%; object-fit:contain; padding:3px; }
     header nav p { margin:0 0 3px; color:#16a34a; font-size:14px; font-weight:900; letter-spacing:.12em; }
     header h1 { margin:0; color:#052e16; font-size:30px; line-height:1.15; }
     button { font:inherit; cursor:pointer; }
@@ -33,7 +34,7 @@
     main > section:first-child > div:last-child > div { display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border:1px solid rgba(190,242,100,.5); border-radius:999px; color:#ecfccb; background:rgba(190,242,100,.14); font-weight:900; }
     #hero-title { margin:20px 0 0; font-size:clamp(42px,7vw,72px); line-height:1.05; }
     #hero-title span { color:var(--yellow); }
-    #hero-title + p { max-width:720px; margin:16px 0 0; color:#dcfce7; font-size:20px; font-weight:700; line-height:1.7; }
+    #hero-title + p { max-width:100%; margin:16px 0 0; color:#dcfce7; font-size:20px; font-weight:700; line-height:1.7; word-break:keep-all; }
     main > section:nth-of-type(2) { padding:36px; text-align:center; border:1px solid #dcfce7; background:rgba(255,255,255,.94); box-shadow:0 18px 50px rgba(22,101,52,.16); }
     main > section:nth-of-type(2) > div:first-child { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
     main > section:nth-of-type(2) > div:first-child > div { display:inline-flex; align-items:center; gap:12px; padding:12px 24px; border-radius:999px; color:#15803d; background:#dcfce7; font-size:36px; font-weight:900; }
@@ -90,7 +91,7 @@
     <nav class="glass neon-shadow rounded-3xl px-4 py-3 md:px-6 md:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" aria-label="주요 기능">
       <div class="flex items-center gap-3">
         <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-full bg-gradient-to-br from-green-600 to-emerald-700 text-white flex items-center justify-center shadow-lg ring-4 ring-lime-300/70" aria-hidden="true">
-          <span class="display-font text-3xl md:text-4xl">e</span>
+          <img src="ieun-logo.png" alt="이은학교 마크">
         </div>
         <div>
           <p class="text-xs md:text-sm font-black tracking-widest text-green-600">꿈 · 도전 · 디지털 세상</p>
@@ -114,7 +115,7 @@
           <span aria-hidden="true">🏅</span> 모두가 주인공인 디지털 축제
         </div>
         <h2 id="hero-title" class="display-font mt-5 text-4xl sm:text-5xl md:text-7xl leading-tight">우리의 가능성을<br><span class="text-yellow-300">클릭!</span> 하세요</h2>
-        <p class="mt-4 max-w-2xl text-base md:text-xl text-green-100 font-bold leading-relaxed">배우고, 도전하고, 함께 성장하는 이은학교 정보경진대회에 오신 것을 환영합니다.</p>
+        <p class="mt-4 max-w-2xl text-base md:text-xl text-green-100 font-bold leading-relaxed">함께 성장하는 이은 이페스티벌 정보경진대회에 오신걸 환영합니다.</p>
       </div>
     </section>
 
@@ -189,7 +190,7 @@
         playNote('G5', '16n');
         if (!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance('이은학교 학생 수는 모두 225명 입니다.');
+        const utterance = new SpeechSynthesisUtterance('이은학교 학생 수는 모두 이백이십오명 입니다.');
         utterance.lang = 'ko-KR'; utterance.rate = .88; utterance.pitch = 1.05;
         window.speechSynthesis.speak(utterance);
       }
